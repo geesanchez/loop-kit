@@ -1,16 +1,10 @@
-# Agent Entry Point — Loop System
+# Entry
 
-You are operating inside a loop system. Before doing anything else:
+Read `context/RULES.md`.
+- **Maker (default):** read `LOOP.md`, `context/VISION.md`,
+  `context/ARCHITECTURE.md`, and `memory/PROGRESS.md`; follow LOOP.
+- **Verifier (assigned):** read `verify/CHECKER.md` and the frozen packet;
+  skip the maker loop and progress log.
 
-1. Read `LOOP.md` — it defines the protocol you follow for every task.
-2. Read everything in `context/` — VISION.md, ARCHITECTURE.md, RULES.md.
-3. Read `memory/PROGRESS.md` — what has already been tried and decided.
-
-Non-negotiables (full versions in LOOP.md and context/RULES.md):
-
-- Never start executing before a checkable definition of done is written to
-  `memory/PROGRESS.md`.
-- Never report work as done without verification evidence.
-- Never take an irreversible action (send, publish, deploy, delete, spend)
-  without explicit human approval in this session.
-- Update `memory/PROGRESS.md` at the end of every cycle, including failures.
+Reuse unchanged context. Other files: only at their required stage;
+archives: only relevant entries.

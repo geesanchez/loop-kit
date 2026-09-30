@@ -1,33 +1,37 @@
-# PROGRESS.md — Loop Memory
+# Active memory
 
-> The loop reads this FIRST and updates it LAST, every run. It is the only
-> memory that survives between runs. If it isn't written here, the next run
-> doesn't know it happened.
+Goal: slim and push `codex/verification-contract`; no merge.
+Status: DONE
 
-## Current goal
-(One sentence.)
+## Done criteria
+- C1: startup ≤8,500 characters (AGENTS, LOOP, VISION, ARCHITECTURE, RULES,
+  PROGRESS once each); AGENTS+LOOP+RULES ≤5,000; active memory ≤1,800.
+  Characters/4 is an estimate, not measured model tokens.
+- C2: archive prior completed memory verbatim; retain active criteria,
+  unresolved decisions, and retry consumption.
+- C3: identical entry files; preserve roles, approval/criteria gates, outcomes,
+  retries, injection/secret rules, and integrity safeguards.
+- C4: load verification detail only at that stage; no reviewer for failed or
+  blocked maker checks; no-automation tasks still get independent rubric review.
+- C5: tests, budget checks, links, whitespace, and independent review pass;
+  push this branch and verify remote SHA equals HEAD.
 
-## Definition of done
-(Checkable criteria, written in Stage 2 — before any work started.)
+## Plan
+1. Compact/archive; measure reading sets.
+2. Defer verification detail; check safeguards.
+3. Test/review; push; compare remote HEAD.
 
-- [ ] ...
-- [ ] ...
+## Retry ledger
+| Problem | Budget | Failed rounds | Counted IDs |
+|---|---:|---:|---|
+| context-budget | 5 | 4 | baseline, draft-1, draft-2, draft-3 |
 
-## Status
-NOT STARTED | IN PROGRESS | BLOCKED | DONE
+## Current evidence / next action
+23 tests and independent review PASS; source integrity unchanged.
+Core 4,878 characters. Pushed 817a8b1; remote matched. No merge.
+Token thresholds cover shipped templates, not arbitrary project content.
 
-## Assumptions made
-(Anything assumed in Stage 1 that the human hasn't confirmed.)
-
-## Attempt log
-
-| Run | Date | What was tried | Result | Why it failed (if it did) |
-|-----|------|----------------|--------|---------------------------|
-|     |      |                |        |                           |
-
-## Open items
-(What's still unresolved. The next run starts here.)
-
-## Decisions & lessons
-(Choices made and why, plus anything learned the hard way — so future runs
-never repeat the same mistake.)
+## Relevant history
+[Verified safeguards and publication](archive/2026-09-verification-contract.md).
+[Current measurements/evidence](archive/2026-09-context-budget.md).
+Retrieve selectively.

@@ -1,100 +1,56 @@
-# LOOP.md — Universal Loop Protocol
+# LOOP — Maker protocol
 
-You are an agent operating inside a loop system. This file defines how you run
-ANY task as a closed loop:
+Use loaded context; obey RULES. Verifiers use CHECKER. Verification detail: step 6.
 
-GOAL → CLASSIFY → DEFINE DONE → DISCOVER → PLAN → EXECUTE → VERIFY → ITERATE → STOP
+1. **Classify:** restate the goal as BUILD, RESEARCH, CREATE, or PROCESS.
+   If it cannot support checkable criteria, ask one focused question and stop.
+2. **Define done (gate):** before implementation, record criteria, assumptions,
+   and exact checks/rubrics in `memory/PROGRESS.md` from the request and project
+   quality bar. Preserve them on resumption; changes need human approval.
+   Missing necessary context means BLOCKED.
+3. **Plan:** number steps with checks; address risks first; record the budget below.
+4. **Execute:** make the smallest relevant change; use prior lessons and
+   rerun checks after fixes.
+5. **Self-check (gate):** run configured automation; record evidence.
+   FAIL → step 7; BLOCKED → stop; neither dispatches a checker.
+   Passing → SELF-CHECKED. If automation is inapplicable, complete the work
+   and proceed to independent source/rubric review without inventing a test.
+6. **Verify:** now load `verify/MAKER.md`; hand off to a fresh verifier.
+   Maker evidence alone cannot yield PASS. Missing review → SELF-CHECKED;
+   missing required evidence → BLOCKED, never DONE.
+7. **Iterate/stop:** log failure; check budget before fixing. If budget remains,
+   repair and return to step 5 with a new round ID.
+   Stop on PASS, exhaustion, missing input/access/approval, or suspect criteria.
+   Show contradictions/defects to the human; never game the check.
+8. **Report/memory:** record outcome, evidence pointers, open work, decisions,
+   and ledger; DONE requires independent PASS. Keep active memory ≤1,800
+   characters by linking completed history/bulky evidence in `memory/archive/`.
+   Never drop active criteria, unresolved decisions, or counts to fit; exceed
+   the target if necessary. Retrieve history selectively. The human reads output.
 
-Follow the stages in order. Stage 2 (Define Done) and Stage 6 (Verify) are
-gates — you may never skip them, for any task, no matter how small.
+## Default criteria
 
----
+| Type | Evidence |
+|---|---|
+| BUILD | Spec met; required tests, lint/types, end-to-end checks pass. |
+| RESEARCH | Answer; source each claim; note conflicts/confidence. |
+| CREATE | Rubric before drafting; independent mean ≥8/10, no score <6. |
+| PROCESS | Checklist first; each item completed/escalated; counts reconcile. |
 
-## Stage 1 — Intake & Classify
+## Failure budget
 
-1. Restate the goal in one sentence, in your own words.
-2. Classify the task as one of four types:
-   - **BUILD** — code, automations, data pipelines, anything that runs
-   - **RESEARCH** — find out, analyze, compare, answer a question
-   - **CREATE** — writing, content, documents, designs
-   - **PROCESS** — triage, transform, or decide across many items
-3. If the goal is too vague to write checkable completion criteria, ask the
-   human ONE clarifying question and stop. Otherwise, state your assumptions,
-   log them in `memory/PROGRESS.md`, and proceed.
+Integer 1–5, default 5; reject others before execution. Per stable unresolved
+problem, retain budget, failed count, and counted round IDs. Initial failure
+counts as 1; a full evaluation counts once per problem, not per assertion or
+reviewer of that round. BLOCKED costs zero: stop, don't retry unavailable
+checks. At count ≥ budget, escalate before another fix/retry. Sessions,
+relabeling, related symptoms, replanning, and approved criteria changes never
+reset consumption; do not raise budgets to rescue exhaustion.
 
-## Stage 2 — Define Done (GATE)
+## Outcomes
 
-Before doing ANY work, write the definition of done into `memory/PROGRESS.md`.
-Every criterion must be checkable by a command, a comparison, or a written
-rubric. "Looks good" is not a criterion.
-
-Default criteria by type (tighten with anything in `context/VISION.md`):
-
-| Type     | Done means                                                                                        |
-|----------|---------------------------------------------------------------------------------------------------|
-| BUILD    | All tests pass; lint/type checks clean; runs end-to-end without errors; matches the stated spec    |
-| RESEARCH | Question answered explicitly; every claim has a source; conflicts between sources noted; confidence level stated |
-| CREATE   | A rubric was written BEFORE drafting (e.g. clarity, accuracy, audience fit, goal fit — each /10); output averages ≥ 8 with no dimension < 6 |
-| PROCESS  | Per-item checklist defined first; every item passes or is escalated (never guessed); counts reconcile: items in = items done + escalated |
-
-## Stage 3 — Discover
-
-Read, in this order: `context/VISION.md`, `context/ARCHITECTURE.md`,
-`context/RULES.md`, `memory/PROGRESS.md`. Do not repeat anything PROGRESS.md
-says has already failed. Gather only what this task needs — no general
-exploration.
-
-## Stage 4 — Plan
-
-Write a numbered plan. Each step must name the check that proves it worked.
-Set an iteration budget (default: 5 attempts per failure). Estimate which
-steps are risky and plan those first.
-
-## Stage 5 — Execute
-
-Work one step at a time. Make the smallest change that could pass the check.
-Do not bundle unrelated changes. Respect every constraint in
-`context/RULES.md` at all times.
-
-## Stage 6 — Verify (GATE)
-
-Verification must be a FRESH evaluation, not your own opinion of your own work:
-
-- **Best:** spawn a subagent / open a separate session — ideally a different
-  model — give it ONLY `verify/CHECKER.md`, the definition of done, and the
-  output. Not your reasoning, not your effort, just the work.
-- **Minimum:** run every automated check (tests, linters, source checks,
-  rubric scoring) and record the raw results.
-
-The verdict is PASS or FAIL per criterion, with evidence. No partial credit.
-
-## Stage 7 — Iterate
-
-On FAIL: log the attempt and the reason in `memory/PROGRESS.md`, diagnose,
-fix, return to Stage 6. Never weaken the definition of done to make a failing
-check pass — changing criteria requires explicit human approval, logged.
-
-## Stage 8 — Stop Conditions
-
-Stop and report when ANY of these is true:
-
-1. **PASS** — all criteria met. Summarize with verification evidence.
-2. **Budget exhausted** — 5 failed attempts on the same problem. Escalate
-   with a summary of what was tried and your best diagnosis.
-3. **Blocked** — you need information or a decision only the human has.
-4. **Irreversible action ahead** — anything in the RULES.md approval list
-   (send, publish, deploy, delete, spend). Stop and request approval first.
-5. **Contradictory or suspect criteria** — if satisfying one criterion
-   provably breaks another, or you have concrete evidence a criterion is
-   wrong, stop and escalate with that evidence. The human owns the criteria;
-   never resolve the conflict by editing them or by contorting the work to
-   game a check.
-
-## Stage 9 — Report & Update Memory
-
-Every run ends by updating `memory/PROGRESS.md`: what was tried, what passed,
-what failed and why, what is still open. Then report to the human:
-
-1. Goal and verdict (one line)
-2. Verification evidence (test output, rubric scores, source list)
-3. Open items / what you'd do next
+PASS = all criteria independently satisfied, fresh evidence, protected content
+unchanged. SELF-CHECKED = maker checks passed, review pending. FAIL = known
+criterion failure, contradiction, or protected mutation; also report blocked
+checks. BLOCKED = required input/check/evidence/permission or evaluable criteria
+missing. An unavailable dependency is not a failed product assertion.
