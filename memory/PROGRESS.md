@@ -25,11 +25,11 @@ dedicated branch to the owner's GitHub repository.
       collisions, contradictory criteria, and untrusted output instructions.
 - [x] Independent review reports no unresolved material findings; document
       references and whitespace checks pass.
-- [ ] The changes are committed on a dedicated branch based on the existing
+- [x] The changes are committed on a dedicated branch based on the existing
       GitHub repository; the remote branch resolves to the local commit.
 
 ## Status
-IN PROGRESS
+DONE
 
 ## Assumptions made
 - Task type: BUILD (protocol changes plus repeatable validation).
@@ -59,6 +59,8 @@ IN PROGRESS
 | 2 | 2026-09-30 | Attached existing upstream history at fb34b05; created codex/verification-contract; implemented docs, handoff, acceptance recipes, and optional integrity helper. | SELF-CHECKED | 19 helper tests passed. Preliminary independent review identified missing digest placeholders and an unsafe acceptance recipe; corrected before final review. |
 | 3 | 2026-09-30 | Fresh independent source review of frozen review-2 artifact, helper tests, entry-point equality, local links, whitespace, and before/after hashes. | PASS for source criteria | Reviewer did not author changes or read maker memory. All 19 tests passed; 14 protected files unchanged. No unresolved material findings. Publication still pending. |
 | 4 | 2026-09-30 | Three live, fresh Codex-subagent fixture probes using explicit fixture entry points and frozen packets. | 3/3 expected outcomes | Valid artifact: PASS; wrong artifact plus injected instruction: FAIL without obeying it; missing quality bar: BLOCKED despite passing executable check. All protected fixture files and packets unchanged. |
+| 5 | 2026-09-30 | Committed verified source changes and attempted the requested HTTPS push. | Push failed | Git had no HTTPS credential helper; no source or verification failure. |
+| 6 | 2026-09-30 | Pushed using the already-authenticated GitHub CLI as a per-command credential helper; read remote ref through GitHub API and compared local HEAD. | PASS | Remote and local both resolved to d42da2d75f8f1f2ecbcd2f5d1f0fa552b52695ee. No global Git authentication settings changed. |
 
 ## Retry ledger
 
@@ -92,9 +94,13 @@ Preserve this ledger on resumption. Valid budgets are integers 1–5.
 - Other host-probe recipes (including budget execution, installation,
   and conductor-timed mutation) have not been executed. They were reviewed
   as protocol scenarios; this is not a claim of universal host compliance.
+- Publication: `geesanchez/loop-kit`, branch `codex/verification-contract`.
+  Verified source commit: `d42da2d75f8f1f2ecbcd2f5d1f0fa552b52695ee`.
+  This completion receipt is a subsequent bookkeeping-only commit; it does
+  not change the independently verified protected source.
 
 ## Open items
-- Commit and push the verified branch; confirm remote/local commit equality.
+- None required for this task. The branch is pushed; no merge was requested.
 
 ## Decisions & lessons
 - The audit identified contract ambiguities, not reproduced agent runtime
