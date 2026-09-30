@@ -1,7 +1,7 @@
 # Active memory
 
 Goal: slim and push `codex/verification-contract`; no merge.
-Status: IN PROGRESS
+Status: DONE
 
 ## Done criteria
 - C1: startup ≤8,500 characters (AGENTS, LOOP, VISION, ARCHITECTURE, RULES,
@@ -28,7 +28,7 @@ Status: IN PROGRESS
 
 ## Current evidence / next action
 23 tests and independent review PASS; source integrity unchanged.
-Core 4,878 characters. Budget issue resolved; push pending.
+Core 4,878 characters. Pushed 817a8b1; remote matched. No merge.
 Token thresholds cover shipped templates, not arbitrary project content.
 
 ## Relevant history

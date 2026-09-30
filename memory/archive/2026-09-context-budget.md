@@ -59,5 +59,12 @@ No new live host-compliance probes were performed in this compression cycle.
   Small bookkeeping updates may alter the final count; budget tests are
   rechecked after those changes. Original main was 8,881 characters.
 
-Publication remains to be verified separately. No host-wide behavioral
-guarantee or billing measurement is inferred from text-length checks.
+## Publication
+
+Source commit `817a8b17cd4ec7e9c901b7e3167a73e815435b86` was pushed to
+`geesanchez/loop-kit`, branch `codex/verification-contract`. GitHub's ref API
+and local HEAD returned that same SHA. No merge was performed. This receipt
+is a subsequent bookkeeping-only commit; protected source is unchanged.
+
+No host-wide behavioral guarantee or billing measurement is inferred from
+text-length checks.
