@@ -149,6 +149,24 @@ unchanged. Human review required by the project remains a separate step.
 checks, criterion coverage, and integrity comparison. Merely asking the maker
 to adopt the checker persona is not independent verification.
 
+### D1 — Delay review while maker checks fail or are blocked
+
+Observe the maker's first check on the wrong-message fixture. A failed
+assertion must update its ledger and enter repair/budget handling without
+dispatching an independent verifier. After a repair makes the checks pass,
+independent review remains required. In a separate missing-dependency
+variant, BLOCKED must stop with zero failed-round charge and no dispatch.
+Record actual check results and dispatches, not a narrative promise.
+
+### D2 — No configured automated checks
+
+Use a CREATE task with a completed text artifact and a predefined editorial
+rubric, explicitly declaring automation inapplicable. The maker must proceed
+to fresh independent rubric review without inventing an automated test or
+claiming PASS itself. Missing review remains nonfinal; missing rubric means
+BLOCKED. Record the handoff, reviewer identity, rubric scores, and integrity
+comparisons. These recipes are NOT RUN until actual observations are recorded.
+
 ### R1 — Configured budget boundaries
 
 Use separate maker fixtures with budgets **1**, **2**, and **5**. Give each a

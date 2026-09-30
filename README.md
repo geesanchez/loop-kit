@@ -21,6 +21,8 @@ result. Three principles guide it:
    maker's reasoning or conversation history.
 3. **Keep durable memory.** The maker reads `memory/PROGRESS.md` on entry
    and updates it after every cycle, including failed and blocked cycles.
+   Keep active criteria, decisions, and retry counters there; retrieve
+   archived history only when relevant to the current task.
    The verifier uses its handoff packet and does not update maker memory.
 
 ## What's in the box
@@ -36,8 +38,10 @@ loop-kit/
 │   ├── ARCHITECTURE.md  structure and exact checks (template)
 │   └── RULES.md         constraints and approval boundaries
 ├── memory/
-│   └── PROGRESS.md      maker's criteria, results, and retry counters
+│   ├── PROGRESS.md      compact active criteria, status, and retry counters
+│   └── archive/         completed history; retrieve selectively
 ├── verify/
+│   ├── MAKER.md         handoff preparation, loaded at verification
 │   ├── CHECKER.md       independent verifier instructions
 │   ├── PACKET.md        neutral handoff template
 │   ├── ACCEPTANCE.md    protocol acceptance scenarios
@@ -85,12 +89,28 @@ Inspect destination paths before copying. Do not replace the whole folder:
 
    > Follow LOOP.md as the maker and run the loop on this goal: …
 
-3. Let the maker define done, work, and collect self-check evidence.
-4. Run the independent verifier using the handoff below. If your host
+3. The maker reads its entry point, `LOOP.md`, `context/VISION.md`,
+   `context/ARCHITECTURE.md`, `context/RULES.md`, and `memory/PROGRESS.md`
+   once. Reuse those contents while they remain known and unchanged.
+   README, archived history, and verification reference files are not
+   routine startup reads.
+4. Let the maker define done, work, and run configured automated checks.
+   Repair failures within the budget before dispatching a verifier; stop
+   on BLOCKED checks. If no automated checks apply, completed work still
+   needs independent rubric or source review.
+5. At the verification stage, load `verify/MAKER.md` to prepare the handoff
+   and run the independent verifier. If your host
    cannot provide a separate session or subagent, the result remains
    **SELF-CHECKED**, not a final PASS.
-5. After PASS, read what the agent made. Independent verification does not
+6. After PASS, read what the agent made. Independent verification does not
    replace your understanding of the result.
+
+The shipped templates target at most 8,500 characters for that maker
+startup, including at most 5,000 for the entry point, `LOOP.md`, and
+`context/RULES.md`, and 1,800 for active progress. These are character
+budgets; characters divided by four is only a token estimate. Filled
+project context can grow beyond the template budget, so measure the
+actual files when assessing a project's startup cost.
 
 ## Is your goal loop-able?
 
@@ -113,12 +133,17 @@ Condensed from the authoritative `LOOP.md`:
 1. **Classify** the task and state assumptions.
 2. **Define done.** The maker records checkable criteria in
    `memory/PROGRESS.md` before execution.
-3. **Discover.** Read the project context and prior progress.
+3. **Discover.** Reuse the context and active progress read at entry. Load
+   further sources or archived history only when the task needs them.
 4. **Plan.** Name each step's check and record a failure budget: an integer
    from 1 to 5, default 5. Reject values outside that range.
 5. **Execute** the smallest relevant change.
-6. **Verify.** Collect fresh evidence, independently evaluate every
-   criterion, and check that protected artifacts remained unchanged.
+6. **Verify.** Run configured automated self-checks first. Log and repair
+   FAIL within the budget; stop on BLOCKED, without dispatching a reviewer.
+   After those checks pass, load `verify/MAKER.md` and request independent
+   review of every criterion and protected-artifact integrity. If no
+   automated checks apply, send completed work for independent rubric or
+   source review; that absence alone is neither PASS nor BLOCKED.
 7. **Iterate.** Record each failed verification round, diagnose, and fix.
    A round evaluates the required checks for the candidate; multiple failed
    assertions in that round count once. The initial failed round counts.
@@ -132,6 +157,13 @@ BLOCKED means required inputs, tools, or evidence are unavailable. It does
 not consume the failure budget. It also does not establish success.
 
 ## Verification handoff
+
+This is stage-specific reference material, not part of maker startup.
+Follow `verify/MAKER.md` when ready for independent review; it points to
+the packet and integrity details needed at that stage. `verify/CHECKER.md`
+is the verifier's entry path, and `verify/ACCEPTANCE.md` is for validating
+the protocol. Neither the checker instructions nor helper source belongs
+in routine maker startup context.
 
 Use `verify/PACKET.md` to prepare a neutral, fixed handoff. Include the goal,
 original criteria, relevant quality bar and constraints, exact checks,
