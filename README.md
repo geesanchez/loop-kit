@@ -1,31 +1,96 @@
-# Universal Loop Kit
+# loop-kit
 
-**Markdown-defined agent loops: write down what done means, make the work,
-check it independently, and fix failures within a clear budget.**
+**Your coding agent shouldn't grade its own homework.**
 
-The kit is tool-agnostic. Agents read the Markdown instructions in your
-project folder; no runtime is required to use the protocol. An optional
-Python 3 helper detects changes made during verification.
+`loop-kit` is a small set of Markdown files you copy into a project so a coding agent works in a verified loop. There is no runtime, framework, or package to install—agents just read the Markdown. It works with **Claude Code, Codex, Cursor**, or any agent host that reads `CLAUDE.md` or `AGENTS.md`.
 
-## The idea
+Instead of trusting an agent the moment it says "done," the kit runs every task through four steps:
 
-The loop moves quality control up front: define checkable criteria before
-execution, preserve the evidence, and ask a fresh verifier to judge the
-result. Three principles guide it:
+1. **Define "done" before work starts—and freeze it.** Turn the goal into checkable criteria (tests, a comparison, or a written rubric) before the work begins.
+2. **A maker agent does the work.** Your coding agent builds the solution, runs its own checks, and logs its progress across sessions.
+3. **A separate checker judges the result.** A fresh session or subagent—one that never saw the maker's reasoning or conversation history—evaluates the work from scratch against the frozen criteria.
+4. **Failures return to the maker within a budget.** If a check fails, the evidence goes back to the maker to fix within a failure budget (default: 5 rounds). Only the checker's `PASS` counts as done.
 
-1. **Define done before execution.** Use tests, comparisons, or a written
-   rubric. A vague goal cannot support a reliable verdict.
-2. **Separate making from checking.** A final PASS requires a separate
-   session or subagent that did not make the work. Give it the criteria,
-   relevant constraints, check instructions, and artifact, without the
-   maker's reasoning or conversation history.
-3. **Keep durable memory.** The maker reads `memory/PROGRESS.md` on entry
-   and updates it after every cycle, including failed and blocked cycles.
-   Keep active criteria, decisions, and retry counters there; retrieve
-   archived history only when relevant to the current task.
-   The verifier uses its handoff packet and does not update maker memory.
+---
 
-## What's in the box
+## The problem
+
+If you use coding agents, you have seen this happen: the agent writes broken or incomplete code, runs a shallow check it just invented, and declares the job finished.
+
+Two things cause this:
+
+- **The same mind makes and checks the mistake.** Once an agent convinces itself an approach works, its review shares the same blind spots. If it forgot an edge case while writing the code, it will forget the same edge case while testing it.
+- **Vague goals can't be checked, so anything passes.** When "done" isn't pinned down upfront, the agent quietly defines "done" as whatever it just built.
+
+`loop-kit` fixes this by separating the roles in plain Markdown. Criteria are frozen before execution, and verification is handed off to an independent session that only sees the goal, the rules, the frozen checks, and the artifact.
+
+```text
+[ 1. Freeze "done" ]  (tests, comparison, or written rubric)
+         |
+         v
+[ 2. Maker works ] <-----------------------------------+
+         |                                             |
+         v                                             |
+[ 3. Separate checker judges ]  (fresh session)        |
+         |                                             |
+         +--- FAIL (with evidence, up to 5 rounds) ----+
+         |
+         v
+[ 4. PASS ]  (only the checker's PASS counts as done)
+```
+
+---
+
+## Example walkthrough
+
+Suppose you give your agent this goal: **`wordstats.py` prints word count and top-5 words.**
+
+1. **Freeze "done":** Before writing code, the acceptance criteria are written down and frozen (with a default failure budget of 5 rounds).
+2. **Maker works:** The maker writes `wordstats.py`, runs it on a sample text file, sees the expected word count and top-5 list, and hands the work off for verification.
+3. **Checker breaks it (`FAIL`, round 1 of 5):** A fresh checker session with no access to the maker's chat history tests `wordstats.py` from scratch against the frozen criteria. It runs the script on an empty file. The script crashes. The checker returns `FAIL` with the exact command and traceback as evidence.
+4. **Maker fixes:** The maker reads the failure evidence, updates `wordstats.py` to handle empty files cleanly, and submits a new handoff.
+5. **Checker re-runs from scratch (`PASS`):** A fresh checker runs every check again—including the empty file—confirms the artifact was not modified during verification, and issues a `PASS`.
+
+---
+
+## Who it's for
+
+`loop-kit` is for developers using coding agents (`CLAUDE.md` / `AGENTS.md` hosts) on tasks that have a **checkable finish line**.
+
+If you can finish the sentence **"done means ___"** with a test command, a baseline comparison, or a written rubric, the task fits the loop. (Examples of checkable vs. too-vague goals are in [Is your goal loop-able?](#is-your-goal-loop-able) in the reference manual below.)
+
+Keep the kit's boundaries in mind: Markdown is guidance for well-behaved agents, not an OS sandbox or access control. And a `PASS` is a claim backed by fresh evidence, not a mathematical proof of correctness—still read what the agent made.
+
+---
+
+## Quick start
+
+1. **Copy the kit into your project.** Keep `LOOP.md`, `CLAUDE.md`, `AGENTS.md`, `context/`, `memory/`, and `verify/` in your project root (if adding to an existing repo, see [Install safely](#install-safely) below so you don't overwrite existing files).
+2. **Fill in `context/VISION.md` and `context/ARCHITECTURE.md`.** Write down what the project is, its structure, and the exact test commands or rubric (and review `context/RULES.md` for your constraints).
+3. **Run the loop.** Open your coding agent in the project folder and say:
+
+   > Follow LOOP.md as the maker and run the loop on this goal: …
+
+---
+
+## Verdicts
+
+Every loop ends in one of four verdicts:
+
+| Verdict | What it means |
+| --- | --- |
+| **`PASS`** | A separate checker session verified every frozen criterion with fresh evidence, and the protected artifact remained unchanged. |
+| **`SELF-CHECKED`** | The maker's own checks passed, but a separate checker session has not verified the work yet. **This is not a final `PASS`.** |
+| **`FAIL`** | At least one criterion failed, or verification changed the protected artifact. Returns to the maker if failure budget rounds remain. |
+| **`BLOCKED`** | Required inputs, tools, or evidence are unavailable. Does not consume the failure budget, and claims nothing is done. |
+
+**If your agent host cannot isolate a separate checker session:** Your highest possible verdict is `SELF-CHECKED`. `loop-kit` will not let a single session check its own work and call it a `PASS`.
+
+---
+
+## Reference manual
+
+### What's in the box
 
 ```text
 loop-kit/
@@ -53,9 +118,9 @@ The kit's `CLAUDE.md` and `AGENTS.md` are intentionally identical. Agent
 hosts differ in which entry files they load; confirm that your host reads
 its entry point and follows the role selection before relying on it.
 
-## Install safely
+### Install safely
 
-### New project
+#### New project
 
 Copy the kit into an empty project directory. Keep `LOOP.md` and the entry
 files at the project root. Fill in `context/VISION.md` and
@@ -64,7 +129,7 @@ Review `context/RULES.md` and add your project's constraints. These context
 files are templates; their parenthetical prompts are not completed project
 requirements.
 
-### Existing project
+#### Existing project
 
 Inspect destination paths before copying. Do not replace the whole folder:
 
@@ -82,7 +147,7 @@ Inspect destination paths before copying. Do not replace the whole folder:
 4. Review the resulting diff before using the loop. A safe installation
    preserves existing content unless a replacement was explicitly chosen.
 
-## Quick start
+### Quick start (detailed)
 
 1. Complete installation and the project context above.
 2. Open your agent in the project folder and say:
@@ -112,7 +177,7 @@ budgets; characters divided by four is only a token estimate. Filled
 project context can grow beyond the template budget, so measure the
 actual files when assessing a project's startup cost.
 
-## Is your goal loop-able?
+### Is your goal loop-able?
 
 Can you finish **"done means ___"** with a command, a comparison, or a
 written rubric? If not, sharpen the goal first.
@@ -126,7 +191,7 @@ written rubric? If not, sharpen the goal first.
 `LOOP.md` defines defaults for BUILD, RESEARCH, CREATE, and PROCESS tasks.
 Tighten those defaults with the project's quality bar and actual goal.
 
-## How the loop runs
+### How the loop runs
 
 Condensed from the authoritative `LOOP.md`:
 
@@ -156,7 +221,7 @@ Condensed from the authoritative `LOOP.md`:
 BLOCKED means required inputs, tools, or evidence are unavailable. It does
 not consume the failure budget. It also does not establish success.
 
-## Verification handoff
+### Verification handoff
 
 This is stage-specific reference material, not part of maker startup.
 Follow `verify/MAKER.md` when ready for independent review; it points to
@@ -195,7 +260,7 @@ A different model can add another perspective, but is not required.
 | FAIL | A criterion failed, or verification changed the protected artifact. |
 | BLOCKED | Required inputs, tools, or evidence are unavailable; success cannot be established. |
 
-### Detecting artifact changes
+#### Detecting artifact changes
 
 A snapshot records a baseline; it does **not** prevent writes. Protect the
 criteria, instructions, deliverable, tests, and other verification inputs.
@@ -235,7 +300,7 @@ protected file invalidates verification even
 if the test output says all tests passed. Preserve that evidence before
 the maker updates its progress log.
 
-## The rules
+### The rules
 
 Condensed from `context/RULES.md`:
 
@@ -254,14 +319,14 @@ Condensed from `context/RULES.md`:
 If the user requests a read-only audit, report the criteria and cycle
 results in the response instead of modifying `memory/PROGRESS.md`.
 
-## When the criteria conflict
+### When the criteria conflict
 
 Suppose two tests require the same input to return different strings.
 Report the exact contradiction and options for correcting it, then let the
 human decide. The human owns the criteria. The agent must not silently
 weaken one or special-case the work to hide the conflict.
 
-## Validating the kit
+### Validating the kit
 
 Run the optional helper's automated tests with Python 3:
 
@@ -277,7 +342,7 @@ particular agent host follows the protocol. Record probe inputs, observed
 behavior, and remaining gaps separately. Recheck host behavior when changing
 entry-point loading, permissions, or session isolation.
 
-## Honest limitations
+### Honest limitations
 
 - **Markdown is guidance, not access control.** Independent sessions and
   write restrictions depend on the host. Hash comparisons detect changes;
@@ -290,7 +355,7 @@ entry-point loading, permissions, or session isolation.
   outputs in advance. An unavailable check is BLOCKED, not a failed
   deliverable or a reason to skip evidence.
 
-## Deliberately out of scope
+### Deliberately out of scope
 
 Scheduling, agent fleets, and orchestration infrastructure. The kit defines
 one maker loop and an independent verification handoff in ordinary files.
